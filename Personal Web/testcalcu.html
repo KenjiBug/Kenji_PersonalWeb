@@ -1,0 +1,305 @@
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Modern Neon Calculator</title>
+    <style>
+      /* Body & Animated Background */
+      body {
+        margin: 0;
+        font-family: 'Poppins', sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background: linear-gradient(-45deg, #1e1e2f, #2a2a40, #1a1a2b, #262640);
+        background-size: 400% 400%;
+        animation: gradientShift 15s ease infinite;
+        overflow: hidden;
+        position: relative;
+      }
+
+      @keyframes gradientShift {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+      }
+
+      /* Particle Style */
+      .particle {
+        position: absolute;
+        border-radius: 50%;
+        background: #0ff;
+        opacity: 0.6;
+        pointer-events: none;
+        animation: float 10s linear infinite;
+      }
+
+      @keyframes float {
+        0% { transform: translateY(0) translateX(0); opacity: 0.3; }
+        50% { transform: translateY(-200px) translateX(50px); opacity: 0.8; }
+        100% { transform: translateY(0) translateX(-50px); opacity: 0.3; }
+      }
+
+      /* Calculator Container */
+      .calculator {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(12px);
+        border-radius: 20px;
+        padding: 25px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+        width: 320px;
+        z-index: 10;
+        position: relative;
+      }
+
+      /* Display */
+      #display {
+        width: 100%;
+        height: 70px;
+        font-size: 28px;
+        margin-bottom: 20px;
+        padding: 15px;
+        border: none;
+        border-radius: 15px;
+        text-align: right;
+        background: rgba(255,255,255,0.15);
+        color: #0ff;
+        box-shadow: inset 0 2px 6px rgba(0,0,0,0.5);
+        text-shadow: 0 0 5px #0ff, 0 0 10px #0ff, 0 0 20px #0ff;
+      }
+
+      /* Buttons Grid */
+      .buttons {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 15px;
+      }
+
+      /* Buttons */
+      button {
+        height: 65px;
+        font-size: 20px;
+        border: none;
+        border-radius: 15px;
+        cursor: pointer;
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+        font-weight: 500;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        transition: all 0.2s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      button:hover {
+        background: rgba(0, 255, 255, 0.2);
+        box-shadow: 0 0 15px #0ff, 0 0 30px #0ff;
+      }
+
+      button:active {
+        box-shadow: 0 0 20px #0ff, 0 0 40px #0ff inset;
+        transform: scale(0.95);
+      }
+
+      .equal {
+        grid-column: span 2;
+        background: rgba(0, 255, 255, 0.2);
+        color: #0ff;
+        font-weight: bold;
+      }
+
+      .equal:hover {
+        background: rgba(0, 255, 255, 0.4);
+        box-shadow: 0 0 20px #0ff, 0 0 40px #0ff;
+      }
+
+      .history-btn {
+        grid-column: span 2;
+        background: rgba(255, 0, 150, 0.2);
+        color: #f0f;
+      }
+
+      .history-btn:hover {
+        background: rgba(255, 0, 150, 0.4);
+        box-shadow: 0 0 20px #f0f, 0 0 40px #f0f;
+      }
+
+      /* Modal */
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.6);
+      }
+      .modal-content {
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(15px);
+        margin: 10% auto;
+        padding: 20px;
+        border-radius: 15px;
+        width: 300px;
+        color: #0ff;
+        max-height: 300px;
+        overflow-y: auto;
+        box-shadow: 0 0 20px #0ff;
+        animation: slideDown 0.3s ease;
+      }
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+      .modal-header h3 {
+        margin: 0;
+        color: #fff;
+      }
+      .close {
+        color: #fff;
+        font-size: 20px;
+        cursor: pointer;
+      }
+      .clear-history {
+        background: rgba(255,0,0,0.2);
+        padding: 8px 12px;
+        border-radius: 10px;
+        font-size: 14px;
+        color: #f66;
+        margin-top: 10px;
+        cursor: pointer;
+      }
+      .clear-history:hover {
+        background: rgba(255,0,0,0.4);
+        box-shadow: 0 0 10px #f44;
+      }
+
+      @keyframes slideDown {
+        from { transform: translateY(-50px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Particles -->
+    <script>
+      for(let i=0;i<50;i++){
+        let p = document.createElement('div');
+        p.classList.add('particle');
+        let size = Math.random() * 4 + 2;
+        p.style.width = size + 'px';
+        p.style.height = size + 'px';
+        p.style.left = Math.random() * window.innerWidth + 'px';
+        p.style.top = Math.random() * window.innerHeight + 'px';
+        p.style.animationDuration = (5 + Math.random() * 10) + 's';
+        document.body.appendChild(p);
+      }
+    </script>
+
+    <div class="calculator">
+      <input type="text" id="display" disabled>
+      <div class="buttons">
+        <button onclick="appendValue('7')">7</button>
+        <button onclick="appendValue('8')">8</button>
+        <button onclick="appendValue('9')">9</button>
+        <button onclick="appendValue('/')">÷</button>
+
+        <button onclick="appendValue('4')">4</button>
+        <button onclick="appendValue('5')">5</button>
+        <button onclick="appendValue('6')">6</button>
+        <button onclick="appendValue('*')">×</button>
+
+        <button onclick="appendValue('1')">1</button>
+        <button onclick="appendValue('2')">2</button>
+        <button onclick="appendValue('3')">3</button>
+        <button onclick="appendValue('-')">−</button>
+
+        <button onclick="appendValue('0')">0</button>
+        <button onclick="appendValue('.')">.</button>
+        <button onclick="backspace()">⌫</button>
+        <button onclick="appendValue('+')">+</button>
+
+        <button class="equal" onclick="calculate()">=</button>
+        <button class="history-btn" onclick="openHistory()">History</button>
+      </div>
+    </div>
+
+    <!-- History Modal -->
+    <div id="historyModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>History</h3>
+          <span class="close" onclick="closeHistory()">&times;</span>
+        </div>
+        <div id="historyList"></div>
+        <button class="clear-history" onclick="clearHistory()">Clear History</button>
+      </div>
+    </div>
+
+    <!-- Beep sound -->
+    <audio id="beepSound" src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg"></audio>
+
+    <script>
+      let display = document.getElementById("display");
+      let historyList = document.getElementById("historyList");
+      let beepSound = document.getElementById("beepSound");
+      let modal = document.getElementById("historyModal");
+
+      function playBeep() {
+        beepSound.currentTime = 0;
+        beepSound.play();
+      }
+
+      function appendValue(value) {
+        playBeep();
+        display.value += value;
+      }
+
+      function clearDisplay() {
+        playBeep();
+        display.value = "";
+      }
+
+      function backspace() {
+        playBeep();
+        display.value = display.value.slice(0, -1);
+      }
+
+      function calculate() {
+        playBeep();
+        try {
+          let result = eval(display.value);
+          historyList.innerHTML += `<div>${display.value} = <b>${result}</b></div>`;
+          display.value = result;
+        } catch {
+          display.value = "Error";
+        }
+      }
+
+      function openHistory() {
+        playBeep();
+        modal.style.display = "block";
+      }
+
+      function closeHistory() {
+        playBeep();
+        modal.style.display = "none";
+      }
+
+      function clearHistory() {
+        playBeep();
+        historyList.innerHTML = "";
+      }
+
+      window.onclick = function(event) {
+        if (event.target == modal) {
+          modal.style.display = "none";
+        }
+      }
+    </script>
+  </body>
+  </html>

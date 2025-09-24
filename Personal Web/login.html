@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login Form</title>
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Poppins', 'Segoe UI', Arial, sans-serif;
+      background: radial-gradient(ellipse at bottom, #05010f, #000 80%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      overflow: hidden;
+      color: #fff;
+    }
+
+    /* Starfield + Meteors (unchanged) */
+    .starfield{position:fixed;top:0;left:0;width:100%;height:100%;perspective:1000px;z-index:0;overflow:hidden;}
+    .star{position:absolute;width:2px;height:2px;background:white;border-radius:50%;box-shadow:0 0 6px #fff,0 0 12px #4fc3f7,0 0 20px #81d4fa;animation:moveStar linear infinite;}
+    @keyframes moveStar{from{transform:translateZ(-1000px);opacity:0;}30%{opacity:1;}to{transform:translateZ(500px);opacity:0;}}
+    .meteor{position:absolute;width:2px;height:120px;background:linear-gradient(180deg,rgba(255,255,255,1),rgba(255,255,255,0));border-radius:50%;opacity:.9;filter:blur(1px);transform:rotate(180deg);animation:meteorFall linear forwards;}
+    @keyframes meteorFall{0%{transform:translateY(-150px) rotate(180deg);opacity:0;}10%{opacity:1;}100%{transform:translateY(110vh) rotate(180deg);opacity:0;}}
+
+    /* Container */
+    .container {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 340px;
+      padding: 15px 40px;
+      background: rgba(15, 15, 20, 0.85);
+      border-radius: 20px;
+      border: 2px solid rgba(0, 200, 255, 0.6);
+      box-shadow: 0 0 20px rgba(0, 200, 255, 0.8),
+                  0 0 40px rgba(0, 200, 255, 0.5),
+                  inset 0 0 20px rgba(0, 200, 255, 0.3);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      animation: fadeIn 1s ease;
+    }
+    @keyframes fadeIn {from{opacity:0;transform:translateY(-20px);}to{opacity:1;transform:translateY(0);}}
+
+    h2 { text-align:center;margin-bottom:1.2rem;font-size:26px;font-weight:600; }
+    .form-group { margin-bottom:1rem; }
+    label { display:block;margin-bottom:.4rem;font-weight:600;color:#eee;text-align:left; }
+
+    .input-icon { position: relative; }
+    .input-icon i.fa-lock,
+    .input-icon i.fa-envelope,
+    .input-icon i.fa-envelope-circle-check,
+    .input-icon i.fa-user,
+    .input-icon i.fa-lock-open,
+    .input-icon i.fa-key {
+      position: absolute;
+      top: 50%;
+      left: 12px;
+      transform: translateY(-50%);
+      color: rgba(255,255,255,0.8);
+    }
+    input {
+      width: 100%;
+      padding: 0.8rem 2.5rem 0.8rem 2.5rem; /* extra right padding for eye icon */
+      border: none;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      background: rgba(255,255,255,0.15);
+      color: #fff;
+      outline: none;
+      transition: 0.3s;
+    }
+    input:focus {
+      background: rgba(255,255,255,0.25);
+      box-shadow: 0 0 10px rgba(0,200,255,0.6);
+    }
+    input::placeholder { color: rgba(255,255,255,0.8); }
+
+    /* Eye icon button */
+    .toggle-eye {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(255,255,255,0.8);
+      cursor: pointer;
+      font-size: 1rem;
+      transition: color 0.3s;
+    }
+    .toggle-eye:hover { color: #00e5ff; }
+
+    button {
+      width: 100%;
+      padding: 0.8rem;
+      background: linear-gradient(90deg, #00c6ff, #0072ff);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: bold;
+      transition: transform 0.2s, box-shadow 0.3s;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+    }
+    button:hover { transform: translateY(-2px); box-shadow:0 0 20px rgba(0,200,255,0.8); }
+
+    .links { text-align:center;margin-top:1rem;font-size:0.9rem; }
+    .links a { color:#00e5ff;cursor:pointer;text-decoration:none;font-weight:500;transition:color 0.3s,text-shadow 0.3s; }
+    .links a:hover { text-decoration:underline;color:#fff;text-shadow:0 0 8px #00e5ff; }
+
+    .message { color:#28a745;text-align:center;margin-bottom:1rem;font-weight:500; }
+    .error { color:#ff4d6d;text-align:center;margin-bottom:1rem;font-weight:500; }
+
+    #requirements,#signup-requirements { list-style:none;padding-left:1rem;margin-top:0.5rem;text-align:left; }
+    #requirements li,#signup-requirements li { color:#ff9800;font-size:0.8rem;transition:color 0.3s ease; }
+    #requirements li.valid,#signup-requirements li.valid { color:#28a745; }
+
+    .hidden { display:none; }
+
+    /* Strength meter */
+    .strength-meter { height:6px;width:100%;border-radius:4px;margin-top:6px;background:rgba(255,255,255,0.2);overflow:hidden; }
+    .strength-bar { height:100%;width:0%;transition:width 0.3s ease,background 0.3s ease; }
+    .strength-text { font-size:12px;margin-top:3px;font-weight:500; }
+    .weak{color:#ff4d6d}.medium{color:#ff9800}.good{color:#ffc107}.strong{color:#28a745}
+  </style>
+</head>
+<body>
+  <div class="starfield" id="starfield"></div>
+
+  <div class="container">
+    <!-- LOGIN FORM -->
+    <div id="login-form">
+      <h2>Login</h2>
+      <div id="login-msg"></div>
+      <div class="form-group">
+        <label for="login-email">Email</label>
+        <div class="input-icon">
+          <i class="fa-solid fa-envelope"></i>
+          <input type="email" id="login-email" placeholder="Enter your email">
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="login-password">Password</label>
+        <div class="input-icon">
+          <i class="fa-solid fa-lock"></i>
+          <input type="password" id="login-password" placeholder="Enter your password">
+          <span class="toggle-eye" onclick="togglePassword('login-password', this)"><i class="fa-solid fa-eye"></i></span>
+        </div>
+      </div>
+      <button onclick="login()"><i class="fa-solid fa-right-to-bracket"></i> Login</button>
+      <div class="links">
+        <a onclick="showSignUp()">Sign Up</a> | 
+        <a onclick="showChange()">Change Password</a>
+      </div>
+    </div>
+
+    <!-- SIGN UP FORM -->
+    <div id="signup-form" class="hidden">
+      <h2>Sign Up</h2>
+      <div id="signup-msg"></div>
+      <div class="form-group">
+        <label for="signup-email">Email</label>
+        <div class="input-icon">
+          <i class="fa-solid fa-envelope-circle-check"></i>
+          <input type="email" id="signup-email" placeholder="Enter your email">
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="signup-password">Password</label>
+        <div class="input-icon">
+          <i class="fa-solid fa-lock"></i>
+          <input type="password" id="signup-password" placeholder="Enter your password" oninput="updateSignupRequirements()">
+          <span class="toggle-eye" onclick="togglePassword('signup-password', this)"><i class="fa-solid fa-eye"></i></span>
+        </div>
+        <div class="strength-meter"><div id="signup-strength" class="strength-bar"></div></div>
+        <div id="signup-strength-text" class="strength-text"></div>
+        <ul id="signup-requirements">
+          <li id="s-lowercase">• Lowercase letter</li>
+          <li id="s-uppercase">• Uppercase letter</li>
+          <li id="s-digit">• Digit</li>
+          <li id="s-special">• Special character</li>
+          <li id="s-length">• Minimum length of 8</li>
+        </ul>
+      </div>
+      <button onclick="signUp()"><i class="fa-solid fa-user-plus"></i> Sign Up</button>
+      <div class="links">
+        <a onclick="showLogin()">Back to Login</a>
+      </div>
+    </div>
+
+    <!-- CHANGE PASSWORD FORM -->
+    <div id="change-form" class="hidden">
+      <h2>Change Password</h2>
+      <div id="change-msg"></div>
+      <div class="form-group">
+        <label for="change-email">Email</label>
+        <div class="input-icon">
+          <i class="fa-solid fa-user"></i>
+          <input type="email" id="change-email" placeholder="Enter your email">
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="old-password">Old Password</label>
+        <div class="input-icon">
+          <i class="fa-solid fa-lock-open"></i>
+          <input type="password" id="old-password" placeholder="Enter old password">
+          <span class="toggle-eye" onclick="togglePassword('old-password', this)"><i class="fa-solid fa-eye"></i></span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="new-password">New Password</label>
+        <div class="input-icon">
+          <i class="fa-solid fa-key"></i>
+          <input type="password" id="new-password" placeholder="Enter new password" oninput="updateRequirements()">
+          <span class="toggle-eye" onclick="togglePassword('new-password', this)"><i class="fa-solid fa-eye"></i></span>
+        </div>
+        <div class="strength-meter"><div id="change-strength" class="strength-bar"></div></div>
+        <div id="change-strength-text" class="strength-text"></div>
+        <ul id="requirements">
+          <li id="lowercase">• Lowercase letter</li>
+          <li id="uppercase">• Uppercase letter</li>
+          <li id="digit">• Digit</li>
+          <li id="special">• Special character</li>
+          <li id="length">• Minimum length of 8</li>
+        </ul>
+      </div>
+      <button onclick="changePassword()"><i class="fa-solid fa-arrows-rotate"></i> Change Password</button>
+      <div class="links">
+        <a onclick="showLogin()">Back to Login</a>
+      </div>
+    </div>
+  </div>
+
+<script>
+  /* existing JS functions unchanged except togglePassword */
+  let users = [{ email: "websystem1@email.com", password: "WebSystem@1" }];
+
+  function validateLUDS8(p){const l=/[a-z]/.test(p),u=/[A-Z]/.test(p),d=/\d/.test(p),s=/[!@#$%^&*(),.?":{}|<>]/.test(p),len=p.length>=8;return{lower:l,upper:u,digit:d,special:s,length:len};}
+  function calculateStrength(p){let c=0,t=validateLUDS8(p);if(t.lower)c++;if(t.upper)c++;if(t.digit)c++;if(t.special)c++;if(t.length)c++;return c;}
+  function updateStrengthMeter(p,b,t){const bar=document.getElementById(b),txt=document.getElementById(t),s=calculateStrength(p);
+    let w=(s/5)*100,col="#ff4d6d",lbl="Weak",cls="weak";
+    if(s<=2){col="#ff4d6d";lbl="Weak";cls="weak";}
+    else if(s===3){col="#ff9800";lbl="Medium";cls="medium";}
+    else if(s===4){col="#ffc107";lbl="Good";cls="good";}
+    else if(s===5){col="#28a745";lbl="Strong";cls="strong";}
+    bar.style.width=w+"%";bar.style.background=col;txt.textContent=lbl;txt.className="strength-text "+cls;}
+  function updateRequirements(){const p=document.getElementById('new-password').value,c=validateLUDS8(p);['lowercase','uppercase','digit','special','length'].forEach(k=>updateItem(k,c[k]));updateStrengthMeter(p,"change-strength","change-strength-text");}
+  function updateSignupRequirements(){const p=document.getElementById('signup-password').value,c=validateLUDS8(p);['s-lowercase','s-uppercase','s-digit','s-special','s-length'].forEach((k,i)=>{const map=['lower','upper','digit','special','length'];updateItem(k,c[map[i]]);});updateStrengthMeter(p,"signup-strength","signup-strength-text");}
+  function updateItem(id,cond){const e=document.getElementById(id);cond?e.classList.add('valid'):e.classList.remove('valid');}
+  function showLogin(){['login-form','signup-form','change-form'].forEach(f=>document.getElementById(f).classList.add('hidden'));document.getElementById('login-form').classList.remove('hidden');clearMessages();}
+  function showSignUp(){['login-form','signup-form','change-form'].forEach(f=>document.getElementById(f).classList.add('hidden'));document.getElementById('signup-form').classList.remove('hidden');clearMessages();}
+  function showChange(){['login-form','signup-form','change-form'].forEach(f=>document.getElementById(f).classList.add('hidden'));document.getElementById('change-form').classList.remove('hidden');clearMessages();}
+  function clearMessages(){['login-msg','signup-msg','change-msg'].forEach(id=>document.getElementById(id).innerHTML='');}
+  function login(){const e=document.getElementById('login-email').value.trim(),p=document.getElementById('login-password').value.trim(),u=users.find(x=>x.email===e&&x.password===p);if(u){const c=validateLUDS8(p);if(!(c.lower&&c.upper&&c.digit&&c.special&&c.length)){document.getElementById('login-msg').innerHTML='<p class="error">Password does not meet requirements.</p>';return;}window.location.href="calculator.html";}else{document.getElementById('login-msg').innerHTML='<p class="error">Invalid email or password</p>';}}
+  function signUp(){const e=document.getElementById('signup-email').value.trim(),p=document.getElementById('signup-password').value.trim(),ex=users.find(x=>x.email===e);if(ex){document.getElementById('signup-msg').innerHTML='<p class="error">Email already registered</p>';return;}const c=validateLUDS8(p);if(!(c.lower&&c.upper&&c.digit&&c.special&&c.length)){document.getElementById('signup-msg').innerHTML='<p class="error">Password does not meet requirements</p>';return;}users.push({email:e,password:p});document.getElementById('signup-msg').innerHTML='<p class="message">Account created successfully! Returning to login...</p>';setTimeout(()=>{showLogin();document.getElementById('login-msg').innerHTML='<p class="message">Account created. Please log in.</p>';},2000);}
+  function changePassword(){const e=document.getElementById('change-email').value.trim(),o=document.getElementById('old-password').value.trim(),n=document.getElementById('new-password').value.trim(),u=users.find(x=>x.email===e&&x.password===o);if(!u){document.getElementById('change-msg').innerHTML='<p class="error">Invalid email or old password</p>';return;}const c=validateLUDS8(n);let err=[];if(!c.lower)err.push("Lowercase letter");if(!c.upper)err.push("Uppercase letter");if(!c.digit)err.push("Digit");if(!c.special)err.push("Special character");if(!c.length)err.push("Minimum length of 8");if(err.length>0){document.getElementById('change-msg').innerHTML='<p class="error">New password must include: '+err.join(", ")+'</p>';return;}u.password=n;document.getElementById('change-msg').innerHTML='<p class="message">Password changed successfully! Returning to login...</p>';setTimeout(()=>{showLogin();document.getElementById('login-msg').innerHTML='<p class="message">Password changed. Please log in with your new password.</p>';},2000);}
+  function togglePassword(fieldId,iconSpan){
+    const field=document.getElementById(fieldId);
+    const icon=iconSpan.querySelector('i');
+    if(field.type==="password"){ field.type="text"; icon.classList.remove('fa-eye'); icon.classList.add('fa-eye-slash'); }
+    else { field.type="password"; icon.classList.remove('fa-eye-slash'); icon.classList.add('fa-eye'); }
+  }
+  function createStars(){const s=document.getElementById('starfield');for(let i=0;i<150;i++){const star=document.createElement('div');star.className='star';star.style.left=Math.random()*100+"%";star.style.top=Math.random()*100+"%";star.style.animationDuration=(5+Math.random()*10)+"s";star.style.animationDelay=(Math.random()*10)+"s";s.appendChild(star);}}
+  function createMeteors(){const s=document.getElementById('starfield');setInterval(()=>{const m=document.createElement('div');m.className='meteor';m.style.left=Math.random()*100+"%";m.style.animationDuration=(1+Math.random()*1.5)+"s";s.appendChild(m);setTimeout(()=>m.remove(),2000);},3000);}
+  createStars();createMeteors();
+</script>
+</body>
+</html>

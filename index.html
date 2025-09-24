@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="style.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="favicon-16x16.png" type="image/png" />
+    <title>Personal Web</title>
+
+</head>
+<body>
+
+<header>
+  <nav>
+  <h2 class="logo">Hyasaint</h2>
+  <button class="menu-toggle" id="menuToggle">☰</button> <!-- ADD THIS -->
+  <ul id="navLinks">
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#hobbies">Hobbies</a></li>
+    <li><a href="#gallery">Gallery</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#bid">LOML</a></li>
+    <li><a href="#loc">Location</a></li>
+    <li><a href="#contact">Contact</a></li> <!-- NEW -->
+
+  </ul>
+  <br>
+  <br>
+  <button id="darkToggle" class="dark-btn">🌙</button>
+</nav>
+
+</header>
+
+<section class="hero">
+  <div class="profile">
+    <a href="https://www.facebook.com/johnkenneth.alcantara832/" target="_blank">
+      <img src="memyselfandi.png" alt="Profile Picture" />
+    </a>
+  </div>
+  <div class="intro">
+    <h1>Bai Senyor</h1>
+    <p class="role">Gwapo lang</p>
+    <a href="#projects" class="btn">Projects</a>
+  </div>
+</section>
+
+
+<section id="skills" class="card-section fade-in">
+  <div class="card">
+    <h3>Skills</h3>
+    <ul>
+      <li>HTML</li>
+      <li>CSS</li>
+      <li>JavaScript</li>
+      <li>React</li>
+      <li>Node.js</li>
+      <li>Python</li>
+    </ul>
+  </div>
+</section>
+
+<section id="hobbies" class="card-section fade-in">
+  <div class="card">
+    <h3>Hobbies</h3>
+    <ul>
+      <li>Photography</li>
+      <li>Travel</li>
+      <li>Reading</li>
+      <li>Music</li>
+      <li>Gaming</li>
+      <li>Fitness</li>
+    </ul>
+  </div>
+</section>
+
+<section id="gallery" class="card-section fade-in">
+  <div class="card">
+    <h3>Gallery</h3>
+    <div class="gallery">
+      <div class="box">
+        <img src="hya.png" alt="i1" />
+      </div>
+      <div class="box">
+        <img src="knithya.png" alt="i2" />
+      </div>
+      <div class="box">
+        <img src="maroon-_2_.png" alt="" />
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="bid" class="video">
+  <div class="box">
+    <h3>LOVE OF MY LIFE</h3>
+    <video autoplay muted loop>
+      <source src="vid.mp4" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+  </div>
+</section>
+
+
+
+<section id="projects" class="projects">
+  <h2>Student Projects</h2>
+  
+  <div class="project-grid">
+    <a href="index1.html" class="project-card">
+      <img src="Screenshot (1).png" alt="Portfolio Website Image" />
+      <div>
+        <h3>PROJECT 1</h3>
+        <p>Chat GPT Clone</p>
+      </div>
+    </a>
+
+    <a href="index2.html" class="project-card">
+      <img src="bootsrap3.png" alt="E-commerce Dashboard Image" />
+      <div>
+        <h3>PROJECT 2</h3>
+        <p>Bootstrap</p>
+      </div>
+    </a>
+
+    <!-- Add two more projects if needed -->
+    <a href="login.html" class="project-card">
+      <img src="login.png" alt="Project 3 Image" />
+      <div>
+        <h3>PROJECT 3</h3>
+        <p>Log In Form</p>
+      </div>
+    </a>
+
+    <a href="todolist.html" class="project-card">
+      <img src="todolist.png" alt="Project 4 Image" />
+      <div>
+        <h3>PROJECT 4</h3>
+        <p>Calculator</p>
+      </div>
+    </a>
+  </div>
+</section>
+
+
+<section id="loc" class="card-section fade-in">
+  <div class="card">
+    <h3>📍 My Location</h3>
+    <p>Farm 2 Dapco, Panabo City</p>
+
+    <div class="map-container">
+  <iframe
+    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15826.753238076404!2d125.57814473264298!3d7.38878171160415!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x32f949b59b670ad9%3A0xd34ae651cb2d39da!2sDapco%2C%20Panabo%20City%2C%20Davao%20del%20Norte!5e0!3m2!1sen!2sph!4v1757099242393!5m2!1sen!2sph"
+    width="100%"
+    height="300"
+    style="border:0;"
+    allowfullscreen=""
+    loading="lazy"
+    referrerpolicy="no-referrer-when-downgrade">
+  </iframe>
+</div>
+
+
+    <a href="https://www.google.com/maps/place/Dapco,+Panabo+City,+Davao+del+Norte/@7.388761,125.588445,14z/data=!4m6!3m5!1s0x32f949b59b670ad9:0xd34ae651cb2d39da!8m2!3d7.3882723!4d125.5904048!16s%2Fg%2F11gbfd5sz4?hl=en&entry=ttu&g_ep=EgoyMDI1MDkwMi4wIKXMDSoASAFQAw%3D%3D" target="_blank" class="btn pulse-hover" style="margin-top: 20px;">
+      🧭 Get Directions
+    </a>
+  </div>
+</section>
+
+<section id="contact" class="card-section fade-in">
+  <div class="card">
+    <h3>📬 Contact Me</h3>
+    <form action="mailto:your-email@example.com" method="POST" enctype="text/plain">
+      <label for="name">Name:</label>
+      <input type="text" id="name" name="name" required />
+
+      <label for="email">Email:</label>
+      <input type="email" id="email" name="email" required />
+
+      <label for="message">Message:</label>
+      <textarea id="message" name="message" rows="5" required></textarea>
+
+      <button type="submit" class="btn pulse-hover" style="margin-top: 10px;">Send Message</button>
+    </form>
+  </div>
+</section>
+
+<footer>
+  <p>© 2025 John Kenneth Alcantara | All rights reserved.</p>
+</footer>
+
+<audio autoplay loop>
+  <source src="beabadoobee - Glue Song (Official Music Video).mp3" type="audio/mpeg">
+  Your browser does not support the audio element.
+</audio>
+
+<script src="javascript.js"></script>
+</body>
+</html>

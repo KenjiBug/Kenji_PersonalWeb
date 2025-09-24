@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login & Sign Up</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
+
+    body {
+      display: flex; 
+      justify-content: center; 
+      align-items: center;
+      height: 100vh; 
+      background: linear-gradient(270deg, #1a1a2e, #162447, #1f4068, #1b1b2f);
+      background-size: 800% 800%;
+      animation: gradientAnimation 20s ease infinite;
+      overflow: hidden;
+    }
+
+    @keyframes gradientAnimation {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Glassmorphism Card */
+    .container {
+      width: 380px; 
+      padding: 30px; 
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      border: 1px solid rgba(255,255,255,0.15);
+      animation: floatCard 6s ease-in-out infinite;
+    }
+
+    h2 { 
+      text-align: center; 
+      margin-bottom: 20px; 
+      font-size: 24px;
+      background: linear-gradient(45deg, #ffffff, #a3a3ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: 700;
+    }
+
+    .input-group { position: relative; margin: 14px 0; }
+
+    input {
+      width: 100%; 
+      padding: 12px 14px; 
+      border: 1.5px solid rgba(255,255,255,0.2);
+      border-radius: 10px; 
+      padding-right: 40px;
+      font-size: 15px;
+      color: #cde4ff; /* softer light blue for dark background */
+      text-shadow: 0 0 3px rgba(0,0,0,0.5);
+      background: rgba(255,255,255,0.05);
+      transition: all 0.3s;
+    }
+    input:focus {
+      border-color: #4f7fff;
+      outline: none;
+      box-shadow: 0 0 10px rgba(79,127,255,0.6);
+    }
+    input::placeholder { color: rgba(205,228,255,0.6); }
+
+    .toggle-password {
+      position: absolute;
+      right: 12px; top: 50%; transform: translateY(-50%);
+      cursor: pointer; color: #bbb; font-size: 16px;
+    }
+
+    button {
+      width: 100%; padding: 12px; margin-top: 15px;
+      border: none; border-radius: 10px; cursor: pointer;
+      background: linear-gradient(135deg, #4f7fff, #1f3bb3);
+      color: #e0f7ff;
+      font-weight: bold; font-size: 15px;
+      transition: all 0.3s;
+    }
+    button:disabled { background: #555; cursor: not-allowed; }
+    button:hover:enabled { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(79,127,255,0.5); }
+
+    p { text-align: center; margin-top: 15px; font-size: 14px; color: #ccc; }
+    a { color: #4f7fff; cursor: pointer; font-weight: bold; }
+    a:hover { text-decoration: underline; }
+
+    .rules { font-size: 13px; color: #bbb; margin-top: 10px; padding-left: 5px; }
+    .rules li { list-style: none; margin: 5px 0; transition: color 0.3s; }
+    .valid { color: #22c55e; }
+    .invalid { color: #f87171; }
+
+    .strength-bar { height: 8px; border-radius: 5px; margin-top: 6px; background: rgba(255,255,255,0.1); overflow: hidden; }
+    .strength-fill { height: 100%; width: 0%; transition: width 0.4s ease, background 0.4s ease; }
+    .weak { background: #f87171; width: 33%; }
+    .medium { background: #fbbf24; width: 66%; }
+    .strong { background: #22c55e; width: 100%; }
+
+    .strength-text { font-size: 12px; margin-top: 4px; font-weight: bold; text-align: right; color: #fff; }
+
+    @keyframes floatCard { 0%,100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
+
+    /* Animated Orbs */
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.4;
+      animation: moveOrb 20s infinite alternate ease-in-out;
+    }
+    .orb1 { width: 250px; height: 250px; background: #4f7fff; top: 10%; left: 10%; }
+    .orb2 { width: 300px; height: 300px; background: #22c55e; bottom: 15%; right: 5%; }
+    .orb3 { width: 200px; height: 200px; background: #a64eff; top: 30%; right: 20%; }
+
+    @keyframes moveOrb {
+      0% { transform: translate(0,0) scale(1); }
+      50% { transform: translate(50px,-50px) scale(1.2); }
+      100% { transform: translate(0,0) scale(1); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+<div class="orb orb3"></div>
+
+<div class="container" id="form-container">
+  <!-- Login Form -->
+  <div id="login-form">
+    <h2>Login</h2>
+    <div class="input-group">
+      <input type="email" id="login-email" placeholder="Email" required>
+    </div>
+    <div class="input-group">
+      <input type="password" id="login-password" placeholder="Password" required>
+      <i class="fa-solid fa-eye toggle-password" onclick="togglePassword('login-password', this)"></i>
+    </div>
+    <button onclick="login()">Login</button>
+    <p>Don't have an account? <a onclick="showSignup()">Sign Up</a></p>
+  </div>
+
+  <!-- Sign Up Form -->
+  <div id="signup-form" style="display:none;">
+    <h2>Sign Up</h2>
+    <div class="input-group">
+      <input type="email" id="signup-email" placeholder="Email" required>
+    </div>
+    <div class="input-group">
+      <input type="password" id="signup-password" placeholder="Password" required onkeyup="checkPassword()">
+      <i class="fa-solid fa-eye toggle-password" onclick="togglePassword('signup-password', this)"></i>
+    </div>
+    <div class="strength-bar"><div id="strength-fill" class="strength-fill"></div></div>
+    <div id="strength-text" class="strength-text"></div>
+    <div class="input-group">
+      <input type="password" id="confirm-password" placeholder="Confirm Password" required onkeyup="checkConfirmPassword()">
+      <i class="fa-solid fa-eye toggle-password" onclick="togglePassword('confirm-password', this)"></i>
+    </div>
+    <ul class="rules">
+      <li id="rule-lower" class="invalid">✖ At least 1 lowercase letter</li>
+      <li id="rule-upper" class="invalid">✖ At least 1 uppercase letter</li>
+      <li id="rule-digit" class="invalid">✖ At least 1 number</li>
+      <li id="rule-special" class="invalid">✖ At least 1 special character (!@#$%)</li>
+      <li id="rule-length" class="invalid">✖ Minimum of 8 characters</li>
+      <li id="rule-match" class="invalid">✖ Passwords must match</li>
+    </ul>
+    <button id="signup-btn" onclick="signup()" disabled>Sign Up</button>
+    <p>Already have an account? <a onclick="showLogin()">Login</a></p>
+  </div>
+</div>
+
+<script>
+  let accounts = JSON.parse(localStorage.getItem("accounts")) || [
+    { email: "test@example.com", password: "Test@1234" }
+  ];
+
+  function saveAccounts() {
+    localStorage.setItem("accounts", JSON.stringify(accounts));
+  }
+
+  function showSignup() {
+    document.getElementById("login-form").style.display = "none";
+    document.getElementById("signup-form").style.display = "block";
+  }
+
+  function showLogin() {
+    document.getElementById("signup-form").style.display = "none";
+    document.getElementById("login-form").style.display = "block";
+  }
+
+  function togglePassword(id, icon) {
+    const input = document.getElementById(id);
+    if (input.type === "password") {
+      input.type = "text";
+      icon.classList.remove("fa-eye");
+      icon.classList.add("fa-eye-slash");
+    } else {
+      input.type = "password";
+      icon.classList.remove("fa-eye-slash");
+      icon.classList.add("fa-eye");
+    }
+  }
+
+  function updateRule(id, isValid, text) {
+    const rule = document.getElementById(id);
+    if (isValid) {
+      rule.className = "valid";
+      rule.textContent = "✔ " + text;
+    } else {
+      rule.className = "invalid";
+      rule.textContent = "✖ " + text;
+    }
+  }
+
+  function checkPassword() {
+    const password = document.getElementById("signup-password").value;
+
+    const lower = /[a-z]/.test(password);
+    const upper = /[A-Z]/.test(password);
+    const digit = /[0-9]/.test(password);
+    const special = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+    const length = password.length >= 8;
+
+    updateRule("rule-lower", lower, "At least 1 lowercase letter");
+    updateRule("rule-upper", upper, "At least 1 uppercase letter");
+    updateRule("rule-digit", digit, "At least 1 number");
+    updateRule("rule-special", special, "At least 1 special character (!@#$%)");
+    updateRule("rule-length", length, "Minimum of 8 characters");
+
+    let strength = 0;
+    if (lower) strength++;
+    if (upper) strength++;
+    if (digit) strength++;
+    if (special) strength++;
+    if (length) strength++;
+
+    const fill = document.getElementById("strength-fill");
+    const text = document.getElementById("strength-text");
+
+    if (password.length === 0) {
+      fill.className = "strength-fill";
+      text.textContent = "";
+    } else if (strength <= 2) {
+      fill.className = "strength-fill weak";
+      text.textContent = "Weak";
+      text.style.color = "#f87171";
+    } else if (strength === 3 || strength === 4) {
+      fill.className = "strength-fill medium";
+      text.textContent = "Medium";
+      text.style.color = "#fbbf24";
+    } else if (strength === 5) {
+      fill.className = "strength-fill strong";
+      text.textContent = "Strong";
+      text.style.color = "#22c55e";
+    }
+
+    checkConfirmPassword();
+  }
+
+  function checkConfirmPassword() {
+    const password = document.getElementById("signup-password").value;
+    const confirm = document.getElementById("confirm-password").value;
+
+    const match = password === confirm && confirm !== "";
+    updateRule("rule-match", match, "Passwords must match");
+
+    const allValid = [...document.querySelectorAll(".rules li")].every(li => li.className === "valid");
+    document.getElementById("signup-btn").disabled = !allValid;
+  }
+
+  function signup() {
+    const email = document.getElementById("signup-email").value;
+    const password = document.getElementById("signup-password").value;
+
+    if (accounts.some(acc => acc.email === email)) {
+      alert("This email is already registered.");
+      return;
+    }
+
+    accounts.push({ email, password });
+    saveAccounts();
+
+    alert("Account created successfully! You can now log in.");
+    showLogin();
+  }
+
+  function login() {
+    const email = document.getElementById("login-email").value;
+    const password = document.getElementById("login-password").value;
+
+    const found = accounts.find(acc => acc.email === email && acc.password === password);
+
+    if (found) {
+      alert("Login successful! Welcome " + email);
+      // Redirect to another page after successful login
+      window.location.href = "testcalcu.html"; // <-- palitan ng target page
+    } else {
+      alert("Invalid email or password.");
+    }
+  }
+</script>
+
+
+</body>
+</html>

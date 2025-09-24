@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Advanced To-Do List</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f9;
+      color: #333;
+      display: flex;
+      justify-content: center;
+      padding: 50px;
+      transition: background 0.3s, color 0.3s;
+    }
+    body.dark {
+      background: #181818;
+      color: #f0f0f0;
+    }
+    .todo-container {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      width: 420px;
+      transition: background 0.3s;
+    }
+    body.dark .todo-container {
+      background: #242424;
+    }
+    h2 {
+      text-align: center;
+    }
+    .controls, .input-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+    }
+    input, select, button {
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+    }
+    button {
+      background: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover { background: #45a049; }
+    ul { list-style: none; padding: 0; }
+    li {
+      background: #f9f9f9;
+      margin-bottom: 10px;
+      padding: 10px;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      cursor: grab;
+    }
+    li.completed { text-decoration: line-through; color: #777; }
+    .task-info { flex: 1; }
+    .priority-high { border-left: 5px solid #e74c3c; }
+    .priority-medium { border-left: 5px solid #f1c40f; }
+    .priority-low { border-left: 5px solid #2ecc71; }
+    .overdue { border-left: 5px solid #ff0000 !important; }
+    .delete-btn {
+      background: #e74c3c;
+      padding: 4px 8px;
+      border-radius: 6px;
+    }
+    .edit-btn {
+      background: #3498db;
+      padding: 4px 8px;
+      border-radius: 6px;
+      margin-right: 5px;
+    }
+    .progress-bar {
+      background: #ddd;
+      border-radius: 8px;
+      overflow: hidden;
+      height: 15px;
+      margin: 10px 0;
+    }
+    .progress {
+      background: #4CAF50;
+      height: 100%;
+      width: 0;
+      transition: width 0.3s;
+    }
+  </style>
+</head>
+<body>
+  <div class="todo-container">
+    <h2>To-Do List</h2>
+    <div class="controls">
+      <input type="text" id="search" placeholder="Search tasks...">
+      <button id="darkModeToggle">🌙</button>
+    </div>
+    <div class="input-group">
+      <input type="text" id="taskInput" placeholder="Add a new task...">
+      <input type="date" id="dueDate">
+      <select id="priority">
+        <option value="low">Low</option>
+        <option value="medium">Medium</option>
+        <option value="high">High</option>
+      </select>
+      <button onclick="addTask()">Add</button>
+    </div>
+    <div class="controls">
+      <button onclick="filterTasks('all')">All</button>
+      <button onclick="filterTasks('pending')">Pending</button>
+      <button onclick="filterTasks('completed')">Completed</button>
+    </div>
+    <div class="controls">
+      <button onclick="exportTasks()">Export</button>
+      <input type="file" id="importFile" accept=".json">
+      <button onclick="importTasks()">Import</button>
+    </div>
+    <div class="progress-bar"><div class="progress" id="progress"></div></div>
+    <ul id="taskList"></ul>
+  </div>
+
+  <script>
+    const taskInput = document.getElementById("taskInput");
+    const taskList = document.getElementById("taskList");
+    const search = document.getElementById("search");
+    const dueDate = document.getElementById("dueDate");
+    const priority = document.getElementById("priority");
+    const progress = document.getElementById("progress");
+    const darkModeToggle = document.getElementById("darkModeToggle");
+    const importFile = document.getElementById("importFile");
+    let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+    let filter = 'all';
+
+    function saveTasks() { localStorage.setItem("tasks", JSON.stringify(tasks)); }
+
+    function updateProgress() {
+      const completed = tasks.filter(t => t.completed).length;
+      const percent = tasks.length ? (completed / tasks.length) * 100 : 0;
+      progress.style.width = percent + "%";
+    }
+
+    function isOverdue(task) {
+      if (!task.due || task.completed) return false;
+      const today = new Date();
+      const due = new Date(task.due + "T23:59:59");
+      return due < today;
+    }
+
+    function renderTasks() {
+      taskList.innerHTML = "";
+      const filtered = tasks.filter(t =>
+        (filter === 'all' || (filter === 'completed' && t.completed) || (filter === 'pending' && !t.completed))
+        && t.text.toLowerCase().includes(search.value.toLowerCase())
+      );
+      filtered.forEach((task, index) => {
+        const li = document.createElement("li");
+        li.className = (task.completed ? "completed " : "") + 
+          (isOverdue(task) ? 'overdue ' : '') + 
+          (task.priority === 'high' ? 'priority-high' : task.priority === 'medium' ? 'priority-medium' : 'priority-low');
+        li.draggable = true;
+
+        const info = document.createElement("div");
+        info.className = "task-info";
+        info.innerHTML = `<strong>${task.text}</strong><br>
+          Due: ${task.due || 'N/A'}<br>
+          Added: ${task.timestamp}`;
+
+        li.appendChild(info);
+
+        li.addEventListener("click", () => toggleComplete(index));
+
+        const btns = document.createElement("div");
+        const editBtn = document.createElement("button");
+        editBtn.textContent = "Edit";
+        editBtn.className = "edit-btn";
+        editBtn.onclick = e => { e.stopPropagation(); editTask(index); };
+
+        const delBtn = document.createElement("button");
+        delBtn.textContent = "X";
+        delBtn.className = "delete-btn";
+        delBtn.onclick = e => { e.stopPropagation(); deleteTask(index); };
+
+        btns.appendChild(editBtn);
+        btns.appendChild(delBtn);
+        li.appendChild(btns);
+
+        li.addEventListener("dragstart", e => e.dataTransfer.setData("index", index));
+        li.addEventListener("dragover", e => e.preventDefault());
+        li.addEventListener("drop", e => {
+          e.preventDefault();
+          const fromIndex = e.dataTransfer.getData("index");
+          const toIndex = index;
+          const moved = tasks.splice(fromIndex, 1)[0];
+          tasks.splice(toIndex, 0, moved);
+          saveTasks();
+          renderTasks();
+        });
+
+        taskList.appendChild(li);
+      });
+      updateProgress();
+    }
+
+    function addTask() {
+      const text = taskInput.value.trim();
+      if (!text) return;
+      const now = new Date().toLocaleString();
+      tasks.push({ text, completed: false, due: dueDate.value, priority: priority.value, timestamp: now });
+      taskInput.value = "";
+      dueDate.value = "";
+      saveTasks();
+      renderTasks();
+    }
+
+    function toggleComplete(index) {
+      tasks[index].completed = !tasks[index].completed;
+      saveTasks();
+      renderTasks();
+    }
+
+    function editTask(index) {
+      const newText = prompt("Edit your task:", tasks[index].text);
+      if (newText !== null && newText.trim() !== "") {
+        tasks[index].text = newText.trim();
+        saveTasks();
+        renderTasks();
+      }
+    }
+
+    function deleteTask(index) {
+      tasks.splice(index, 1);
+      saveTasks();
+      renderTasks();
+    }
+
+    function filterTasks(type) {
+      filter = type;
+      renderTasks();
+    }
+
+    function exportTasks() {
+      const blob = new Blob([JSON.stringify(tasks, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "tasks.json";
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function importTasks() {
+      const file = importFile.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        try {
+          const imported = JSON.parse(e.target.result);
+          if (Array.isArray(imported)) {
+            tasks = imported;
+            saveTasks();
+            renderTasks();
+          } else {
+            alert("Invalid file format.");
+          }
+        } catch {
+          alert("Error reading file.");
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    search.addEventListener("input", renderTasks);
+    darkModeToggle.addEventListener("click", () => document.body.classList.toggle("dark"));
+
+    renderTasks();
+
+    
+  </script>
+</body>
+</html>
